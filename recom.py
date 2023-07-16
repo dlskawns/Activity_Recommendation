@@ -6,7 +6,7 @@ from langchain.prompts.prompt import PromptTemplate
 import time
 
 # API 키설정
-OPENAI_API_KEY = "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"
+OPENAI_API_KEY = "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"
 #구글검색하려면 SERPAPI 필요(월 100회 무료/월 5000회 $50/월 15000회 $130/월 30000회 $250)
 os.environ["OPENAI_API_KEY"] = OPENAI_API_KEY
 
