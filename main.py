@@ -5,7 +5,7 @@ import time
 import pandas as pd
 
 
-
+ 
 def main(input_value):
     """
     추천 API 결과 값을 통해 처리
