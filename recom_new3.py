@@ -9,7 +9,7 @@ from langchain.chat_models import ChatOpenAI
 import time
  
 # API 키설정
-OPENAI_API_KEY = "Key"
+OPENAI_API_KEY = "KEY"
 #구글검색하려면 SERPAPI 필요(월 100회 무료/월 5000회 $50/월 15000회 $130/월 30000회 $250)
 os.environ["OPENAI_API_KEY"] = OPENAI_API_KEY
 
@@ -27,7 +27,7 @@ class Act_Rec:
         ResponseSchema(name="Q2", description="두번째 가이드 질문"),
         ResponseSchema(name="Q3", description="세번째 가이드 질문")]
         res_book = [
-        ResponseSchema(name="S1", description="{major}와 연관지어 탐구를 위한 에세이 주제를 출력해."),
+        ResponseSchema(name="S1", description="{major}, 책 내용을 연관지은 탐구 주제."),
         ResponseSchema(name="Q1", description="첫번째 가이드 질문"),
         ResponseSchema(name="Q2", description="두번째 가이드 질문"),
         ResponseSchema(name="Q3", description="세번째 가이드 질문")]
@@ -54,6 +54,10 @@ class Act_Rec:
             # 시간 측정
             start = time.time()
             answer = self.llm(_input.to_messages())
+            print('answer',answer)
+            if answer.content.split('\n\t')[1].strip()[-1] != ',':
+                print('에러발생------------------')
+                answer.content = ','.join(answer.content.split('\n\t')).replace(',','', 1)
             answer = self.output_parser_gen.parse(answer.content)
             end = time.time()
 
@@ -73,7 +77,7 @@ class Act_Rec:
         prompt = ChatPromptTemplate(
             messages=[
                 HumanMessagePromptTemplate.from_template(
-                "{major}와 책 요약 정보를 연결지어 고등학생이 작성할 만한 탐구 주제 1개와 가이드 질문 3개를 진로상담가 처럼 출력해줘\n{format_instructions}\n책 요약:{book_text}"
+                "{major}, 책 정보를 연결지어 고등학생이 작성할 만한 탐구 주제 1개와 가이드 질문 3개를 진로상담가 처럼 출력해줘.\n{format_instructions}\n책 요약:{book_text}"
                 )],                                                             # GPT에게 하달할 프롬프트
             input_variables=["major", "book_text"],                             # 프롬프트 상의 입력 변수 값
             partial_variables={"format_instructions": self.format_instructions_book} # 출력되는 포맷을 변수로 입력
@@ -83,9 +87,12 @@ class Act_Rec:
             # 시간 측정
             
             start = time.time()
-            print("input",_input.to_messages())
+
             answer = self.llm(_input.to_messages())
             print('answer',answer)
+            if answer.content.split('\n\t')[1].strip()[-1] != ',':
+                print('에러발생------------------')
+                answer.content = ','.join(answer.content.split('\n\t')).replace(',','', 1)
             answer = self.output_parser_book.parse(answer.content)
             end = time.time()
 
