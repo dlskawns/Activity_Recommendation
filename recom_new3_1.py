@@ -22,7 +22,7 @@ class Act_Rec:
     def __init__(self):
         self.llm = ChatOpenAI(model_name='gpt-3.5-turbo', temperature=0.8)
         self.response_schemas= [
-            ResponseSchema(name="S1", description="탐구를 위한 에세이 주제. 질문이 아닌 주제를 출력 해야해, 책 내용이 있는 경우, 책 제목을 쓰지 말고 {major}와 연관지어줘"),
+            ResponseSchema(name="S1", description="탐구를 위한 에세이 주제. 질문이 아닌 주제를 출력 해야해"),
             ResponseSchema(name="Q1", description="첫번째 가이드 질문"),
             ResponseSchema(name="Q2", description="두번째 가이드 질문"),
             ResponseSchema(name="Q3", description="세번째 가이드 질문")
@@ -49,6 +49,12 @@ class Act_Rec:
             # 시간 측정
             start = time.time()
             answer = self.llm(_input.to_messages())
+            if answer.content.split('\n\t')[1].strip()[-1] != ',':
+                print('에러발생------------------')
+                answer.content = ','.join(answer.content.split('\n\t')).replace(',','', 1)
+
+            print("answer type:", type(answer))
+            print("answer:", answer)
             answer = self.output_parser.parse(answer.content)
             end = time.time()
 
@@ -78,6 +84,12 @@ class Act_Rec:
             print('book 활동 추천 시작')
             start = time.time()
             answer = self.llm(_input.to_messages())
+            if answer.content.split('\n\t')[1].strip()[-1] != ',':
+                print('에러발생------------------')
+                answer.content = ','.join(answer.content.split('\n\t')).replace(',','', 1)
+
+            print("answer type:", type(answer))
+            print("answer:", answer)
             answer = self.output_parser.parse(answer.content)
             end = time.time()
 
