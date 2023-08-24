@@ -9,7 +9,7 @@ from langchain.chat_models import ChatOpenAI
 from langchain.prompts.few_shot import FewShotPromptTemplate
 from langchain.prompts.few_shot import FewShotChatMessagePromptTemplate
 import time
- 
+  
 # API 키설정
 OPENAI_API_KEY = "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"
 #구글검색하려면 SERPAPI 필요(월 100회 무료/월 5000회 $50/월 15000회 $130/월 30000회 $250)
