@@ -5,12 +5,6 @@ from langchain.prompts.few_shot import FewShotPromptTemplate
 from langchain.prompts.prompt import PromptTemplate
 import time
 
-# API 키설정
-OPENAI_API_KEY = "key_input"
-#구글검색하려면 SERPAPI 필요(월 100회 무료/월 5000회 $50/월 15000회 $130/월 30000회 $250)
-os.environ["OPENAI_API_KEY"] = OPENAI_API_KEY
-
-
 # 예시 넣기
 class cfg:
     examples_book = [
