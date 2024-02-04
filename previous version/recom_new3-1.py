@@ -5,13 +5,7 @@ from langchain.output_parsers import StructuredOutputParser, ResponseSchema
 from langchain.prompts import PromptTemplate, ChatPromptTemplate, HumanMessagePromptTemplate
 from langchain.llms import OpenAI
 from langchain.chat_models import ChatOpenAI
-
 import time
- 
-# API 키설정
-OPENAI_API_KEY = "Key"
-#구글검색하려면 SERPAPI 필요(월 100회 무료/월 5000회 $50/월 15000회 $130/월 30000회 $250)
-os.environ["OPENAI_API_KEY"] = OPENAI_API_KEY
 
 
 class Act_Rec:
