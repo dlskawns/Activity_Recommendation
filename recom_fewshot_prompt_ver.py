@@ -1,23 +1,26 @@
 
 import os
-from langchain.agents import initialize_agent
 from langchain.callbacks import get_openai_callback
 from langchain.output_parsers import StructuredOutputParser, ResponseSchema
-from langchain.prompts import PromptTemplate, ChatPromptTemplate, HumanMessagePromptTemplate, SystemMessagePromptTemplate
+from langchain.prompts import PromptTemplate
 from langchain.llms import OpenAI
-from langchain.chat_models import ChatOpenAI
 from langchain.prompts.few_shot import FewShotPromptTemplate
-from langchain.prompts.few_shot import FewShotChatMessagePromptTemplate
 import time
-  
-# API 키설정
-OPENAI_API_KEY = "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"
-#구글검색하려면 SERPAPI 필요(월 100회 무료/월 5000회 $50/월 15000회 $130/월 30000회 $250)
-os.environ["OPENAI_API_KEY"] = OPENAI_API_KEY
-
 
 class cfg: 
     examples_book = [
+    {
+    "major":'동물학',
+    "book_text":"'보아가 들려주는 원자 모형 이야기'는 덴마크의 물리학자 닐스 보어가 원자 모형의 역사와 원자의 구조에 대해 설명하는 책입니다. 이 책은 원자의 모형이 변해 가는 과정과, 그런 과정을 통해 인류가 알아낸 원자의 구조에 대한 설명은 물론 원자의 구조를 밝혀 낸 사람들의 이야기까지 자세히 들어 있습니다. 세상에서 가장 작은 세계에 대해 관심과 호기심이 많은 학생들과 일반인에게 적극 추천할 만한 책입니다.",
+    "answer":"""{{'S1': '원자의 구조와 동물 생리학의 연결', 'Q1': '원자의 구조와 동물 생리학의 연관성에 따라 원자의 구조가 동물의 기능과 동작에 미치는 영향', 'Q2': '원자의 구조를 통해 동물의 진화적 특징을 분석하고 해석할 수 있는 방법, 'Q3': '원자의 구조에 대한 이해가 동물의 신체 기능 및 행동을 이해하는 데 끼치는 영향'}}"""
+    },
+    {
+    "major":"교육학",
+    "book_text":"이케가야 유지의 『교양으로 읽는 뇌과학』은 뇌의 구조와 기능, 뇌과학이 밝혀낸 인간의 행동과 사고에 대한 다양한 주제를 다룬 교양서입니다. 이 책은 뇌과학의 최신 연구 결과를 바탕으로 뇌의 신비를 쉽고 재미있게 설명하고 있습니다. 또한, 뇌과학이 우리 삶에 어떻게 적용될 수 있는지에 대해 이야기하고 있습니다. 『교양으로 읽는 뇌과학』은 뇌에 대해 관심이 있는 사람이라면 누구나 쉽게 이해할 수 있는 책입니다.",
+    "answer":"""{{"S1": "뇌과학의 중요성과 응용","Q1": "교육학 이론의 발전과정을 토대로 뇌과학이 교육학에 미친 영향 연구","Q2": "뇌과학을 활용한 교육 방법에는 어떤 것들이 있을지, 교육학 이론 중 뇌과학분야와 접목시킨 이론 탐구","Q3": "미디어기술이 빠르게 발전하고 있는 우리 사회에서 뇌과학적 관점에서 우리가 배울 수 있는 인간의 학습 능력 탐구 및 방법"}}"""
+    }]
+
+    legacy_examples_book = [
     {
     "major":'동물학',
     "book_text":"'보아가 들려주는 원자 모형 이야기'는 덴마크의 물리학자 닐스 보어가 원자 모형의 역사와 원자의 구조에 대해 설명하는 책입니다. 이 책은 원자의 모형이 변해 가는 과정과, 그런 과정을 통해 인류가 알아낸 원자의 구조에 대한 설명은 물론 원자의 구조를 밝혀 낸 사람들의 이야기까지 자세히 들어 있습니다. 세상에서 가장 작은 세계에 대해 관심과 호기심이 많은 학생들과 일반인에게 적극 추천할 만한 책입니다.",
@@ -61,9 +64,11 @@ class cfg:
 
     response_schemas= [
         ResponseSchema(name="S1", description="추천된 주제"),
-        ResponseSchema(name="Q1", description="첫번째 가이드 질문"),
-        ResponseSchema(name="Q2", description="두번째 가이드 질문"),
-        ResponseSchema(name="Q3", description="세번째 가이드 질문")
+        ResponseSchema(name="Q1", description="첫번째 리서치 가이드 주제"),
+        ResponseSchema(name="Q2", description="두번째 리서치 가이드 주제"),
+        ResponseSchema(name="Q3", description="세번째 리서치 가이드 주제"),
+        ResponseSchema(name="Q4", description="네번째 리서치 가이드 주제"),
+        ResponseSchema(name="Q5", description="다섯번째 리서치 가이드 주제")
         ]
     output_parser = StructuredOutputParser.from_response_schemas(response_schemas)
     format_instructions = output_parser.get_format_instructions()
@@ -94,7 +99,7 @@ class Act_Rec:
         """
         
         task_description_gen = """
-        관심 분야에 대한 창의적인 탐구 주제 1개를 추천해주세요. 주제에 대한 가이드 질문 3개를 길고 자세히 추천해주세요.\n{format_instructions}
+        관심 분야에 대한 창의적인 탐구 주제 1개를 추천해주세요. 주제에 대한 가이드 질문 3개를 길고 자세히 추천해주세요.\n참고로 존엄사는 사망하는 사람의 존엄성 확보를 목적으로 환자의 자기결정권을 강조하는 용어로서, '임종과정'에 있다는 의학적 판단이 전제된 환자에 대하여 제한적으로 환자의 자기결정을 인정하는 연명의료중단등결정의 이행과는 구별됩니다.\n{format_instructions}
         """
 
         instruction_gen = """
@@ -139,7 +144,7 @@ class Act_Rec:
         """
 
         task_description = """
-        책 내용을 관심분야 {major}에 연결지어 독후감 또는 에세이작성을 위한 주제 1개를 추천해주세요. 주제에 대한 가이드 질문 3개를 길고 자세히 추천해주세요.\n{format_instructions} \n"""
+        책 내용을 관심분야 {major}에 연결지어 독후감 또는 에세이작성을 위한 대표 주제 1개를 추천해주세요. 주제에 대한 서로 다른 리서치 가이드 주제 5개를 길고 자세히 추천해주세요.\n{format_instructions} \n"""
 
         instruction = """
         관심분야: {major} 
